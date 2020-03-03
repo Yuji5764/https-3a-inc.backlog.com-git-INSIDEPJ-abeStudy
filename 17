@@ -1,0 +1,58 @@
+trigger Invoice_Trigger on Invoice__c (after insert, after update,after delete){
+
+    for(Invoice__c invoice : Trigger.new) {
+            System.debug('-------------------- Triggered Record contexts below:');
+            System.debug('## Triggered Name: ' + invoice.Name);
+            System.debug('## Triggered Amount: ' + invoice.Amount__c);
+            System.debug('## Triggered Opportunity__c: ' + invoice.Opportunity__c);
+
+        List<Invoice__c> oppInvoices = [select Status__c,ID,Amount__c from Invoice__c where OpportunityId__c = :invoice.OpportunityId__c];
+                
+            System.debug(oppInvoices.size());
+
+            
+        
+        Decimal totalAmount = 0;
+            for (Invoice__c oppInvoice : oppInvoices) {
+                totalAmount += oppinvoice.Amount__c;}
+
+            Opportunity opp = new Opportunity();
+            opp.Id = invoice.OpportunityId__c;
+            opp.InvoicedAmount__c = totalAmount;
+            update opp;
+            
+                
+        if(trigger.isafter){
+        if(trigger.isupdate){
+                
+            Integer paidsNumber = 0; 
+            for(Invoice__c paids : oppInvoices) {
+                 
+                if (paids.Status__c != 'Z-入金済み') {
+                }if(paidsNumber == 0){
+
+                
+                    opp.Id = invoice.OpportunityId__c;
+                    opp.StageName = '商談WIN (請求済)';
+                    update opp;
+                }}}}
+ 
+
+
+
+            //作成、更新、削除されたときに、Todoに[請求が変更されました]と記載
+            
+            Task Action = new Task();   
+
+                Action.Subject ='請求が更新されました';
+                Action.Description = '新しい請求が出来ましたよー';
+                Action.WhatId = Opportunity.Name;
+                //Action.OwnerId = '阿部勇士';
+                Action.Priority = 'Normal';
+                //Action.IsVisibleSelfService = 'true';
+                Action.ActivityDate = Date.today();
+                Action.Status = 'Completed';
+                
+                update Action;
+
+            }}
