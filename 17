@@ -47,7 +47,8 @@ trigger Invoice_Trigger on Invoice__c (after insert, after update,after delete){
                 Action.Subject ='請求が更新されました';
                 Action.Description = '新しい請求が出来ましたよー';
                 Action.WhatId = Opportunity.Name;
-                //Action.OwnerId = '阿部勇士';
+                //この部分が不正なアサインというエラーになる。↑
+                  //Action.OwnerId = '阿部勇士';
                 Action.Priority = 'Normal';
                 //Action.IsVisibleSelfService = 'true';
                 Action.ActivityDate = Date.today();
